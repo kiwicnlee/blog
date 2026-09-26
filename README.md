@@ -44,3 +44,7 @@ pnpm run build
 仓库的 **Settings → Pages → Build and deployment → Source** 应设为 **GitHub Actions**。发布后，`.github/workflows/pages.yml` 会安装锁定的依赖、生成 `public/`，并部署到 `https://kiwicnlee.github.io/blog/`。
 
 如果以后更换仓库路径或使用自定义域名，请同步修改 `_config.yml` 的 `url`，重新构建后检查首页和文章页的链接。
+
+## 个人在线编辑
+
+独立的 Cloudflare Worker 编辑后台位于 `editor/`，仅允许博客所有者通过 GitHub 登录，支持草稿 PR、富文本和思维导图编辑。后台地址为 `https://kiwi-blog-editor.kiwi-blog-editor.workers.dev/`；设置和维护步骤见 [editor/README.md](editor/README.md)。

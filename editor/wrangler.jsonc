@@ -1,0 +1,18 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "kiwi-blog-editor",
+  "main": "./worker/index.mjs",
+  "compatibility_date": "2026-09-26",
+  "vars": {
+    "EDITOR_ORIGIN": "https://kiwi-blog-editor.kiwi-blog-editor.workers.dev"
+  },
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*", "/auth/*", "/health"]
+  },
+  "ratelimits": [
+    { "name": "AUTH_LIMITER", "namespace_id": "26092601", "simple": { "limit": 20, "period": 60 } },
+    { "name": "API_LIMITER", "namespace_id": "26092602", "simple": { "limit": 30, "period": 60 } }
+  ]
+}
