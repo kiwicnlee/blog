@@ -1,38 +1,47 @@
+<% const firstPage = !page.current || page.current === 1; %>
+<% const leadPost = firstPage && page.posts.length ? page.posts.data[0] : null; %>
 <div id="top"></div>
-<section class="hero container">
-  <div class="hero-copy">
-    <div class="eyebrow"><span class="eyebrow-line"></span><%= theme.hero_label %></div>
-    <h1><%= theme.hero_title %><br><%= theme.hero_title_second %><span class="hero-star" aria-hidden="true">✳</span></h1>
-    <p><%= theme.hero_description %></p>
-    <div class="hero-actions">
-      <a class="button-primary" href="<%- url_for('/archives/') %>">探索文章 <span aria-hidden="true">↗</span></a>
-      <a class="button-secondary" href="<%- url_for('/about/') %>">关于我 <span aria-hidden="true">→</span></a>
+<% if (firstPage) { %>
+  <section class="home-intro container" aria-labelledby="home-title">
+    <div class="intro-copy">
+      <p class="eyebrow"><span class="eyebrow-line"></span><%= theme.hero_label %></p>
+      <h1 id="home-title"><%= theme.hero_title %><br><%= theme.hero_title_second %></h1>
+      <p class="intro-description"><%= theme.hero_description %></p>
+      <div class="hero-actions">
+        <a class="button-primary" href="<%- url_for('/archives/') %>">浏览全部文章 <span aria-hidden="true">↗</span></a>
+        <a class="button-secondary" href="<%- url_for('/about/') %>">关于本站 <span aria-hidden="true">→</span></a>
+      </div>
+      <p class="intro-footnote">技术笔记 / 生活观察 / 持续更新</p>
     </div>
-    <div class="hero-footnote"><span class="footnote-line"></span> 技术 · 生活 · 灵感 · 还有更多</div>
-  </div>
-  <div class="hero-art" aria-hidden="true">
-    <div class="hero-art-inner">
-    <div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div>
-    <div class="art-paper paper-back"><span>OBSERVE</span><b>02</b></div>
-    <div class="art-paper paper-front"><span>FIELD NOTES · 001</span><strong>在平凡的<br>日子里，<br><em>保持好奇。</em></strong><i>✺</i><small>COLLECTING THE MOMENTS THAT MATTER</small></div>
-    <div class="art-badge">IDEAS<br>GROW<br>HERE <span>↗</span></div>
-    <div class="art-spark spark-one">✳</div><div class="art-spark spark-two">✦</div>
-    </div>
-  </div>
-</section>
-<section class="intro-strip"><div class="container intro-inner"><span>01 / ABOUT THIS SPACE</span><p>让想法有地方安放，让热爱有迹可循。<span aria-hidden="true">✳</span></p></div></section>
-<section class="topics-section container" aria-labelledby="topics-heading">
-  <div class="section-head"><div><p class="section-label">FIND YOUR PATH / 从这里读起</p><h2 id="topics-heading">两条阅读路线<span class="heading-mark">.</span></h2></div><a class="section-link" href="<%- url_for('/categories/') %>">浏览所有分类 <span aria-hidden="true">↗</span></a></div>
-  <div class="topics-grid">
-    <a class="topic-card topic-technical" href="<%- url_for('/categories/机器人技术/') %>"><span class="topic-index">01 / ROBOTICS & ENGINEERING</span><span class="topic-symbol" aria-hidden="true">⌘</span><strong>机器人与技术</strong><span class="topic-description">开发笔记、问题排查，以及每一次求证的过程。</span><span class="topic-arrow" aria-hidden="true">↗</span></a>
-    <a class="topic-card topic-life" href="<%- url_for('/categories/生活随笔/') %>"><span class="topic-index">02 / LIFE & OBSERVATION</span><span class="topic-symbol" aria-hidden="true">✳</span><strong>生活与随笔</strong><span class="topic-description">阅读、日常与那些值得慢慢记录的瞬间。</span><span class="topic-arrow" aria-hidden="true">↗</span></a>
-  </div>
-</section>
+    <% if (leadPost) { %>
+      <a class="lead-story" href="<%- url_for(leadPost.path) %>" aria-label="阅读最新文章：<%= leadPost.title %>">
+        <span class="lead-top"><span class="lead-label">最新发布</span><span>NO. 01 / LATEST</span></span>
+        <span class="lead-category"><% if (leadPost.categories && leadPost.categories.length) { %><%= leadPost.categories.data[0].name %><% } else { %>文章手记<% } %></span>
+        <strong class="lead-title"><%= leadPost.title %></strong>
+        <span class="lead-description"><%= leadPost.description || strip_html(leadPost.excerpt || leadPost.content).replace(/\s+/g, ' ').slice(0, 90) %></span>
+        <span class="lead-bottom"><time datetime="<%= date_xml(leadPost.date) %>"><%= date(leadPost.date, 'YYYY.MM.DD') %></time><span>阅读全文 <b aria-hidden="true">↗</b></span></span>
+      </a>
+    <% } %>
+  </section>
+  <nav class="topic-rail container" aria-label="按主题阅读">
+    <a href="<%- url_for('/categories/机器人技术/') %>"><span class="topic-marker technical"></span><span><small>01 / ENGINEERING</small><strong>机器人与技术</strong></span><b aria-hidden="true">↗</b></a>
+    <a href="<%- url_for('/categories/生活随笔/') %>"><span class="topic-marker everyday"></span><span><small>02 / EVERYDAY</small><strong>生活与随笔</strong></span><b aria-hidden="true">↗</b></a>
+  </nav>
+<% } %>
 <section class="posts-section container" aria-labelledby="latest-heading">
-  <div class="section-head"><div><p class="section-label">THE JOURNAL / 文章手记</p><h2 id="latest-heading"><%= theme.featured_label %><span class="heading-mark">.</span></h2></div><a class="section-link" href="<%- url_for('/archives/') %>">查看全部文章 <span aria-hidden="true">↗</span></a></div>
+  <div class="section-head">
+    <div><p class="section-label">THE JOURNAL / 文章目录</p><h2 id="latest-heading"><%= theme.featured_label %></h2></div>
+    <a class="section-link" href="<%- url_for('/archives/') %>">查看归档 <span aria-hidden="true">↗</span></a>
+  </div>
   <% if (page.posts.length) { %>
-    <div class="posts-grid"><% page.posts.each(function(post, index) { %><%- partial('_partial/post-card', {post: post, index: index}) %><% }) %></div>
+    <div class="posts-list">
+      <% page.posts.each(function(post, index) { if (!(leadPost && index === 0)) { %>
+        <%- partial('_partial/post-card', {post: post, index: index}) %>
+      <% } }) %>
+    </div>
     <% if (page.total > 1) { %><nav class="pagination" aria-label="文章分页"><%- paginator({prev_text: '← 上一页', next_text: '下一页 →'}) %></nav><% } %>
   <% } else { %><p class="empty-state">第一篇文章正在路上。稍后再来看看吧。</p><% } %>
 </section>
-<section class="quote-section"><div class="container quote-inner"><span class="quote-symbol">“</span><blockquote>把每一次探索，都变成下一次出发的起点。</blockquote><span class="quote-small">A LITTLE NOTE TO MYSELF</span></div></section>
+<% if (firstPage) { %>
+  <section class="closing-note"><div class="container closing-inner"><div><p class="section-label">ABOUT THIS JOURNAL / 关于这里</p><h2>把每一次探索，写成下一次出发的线索。</h2></div><a href="<%- url_for('/about/') %>">了解这个博客 <span aria-hidden="true">↗</span></a></div></section>
+<% } %>
