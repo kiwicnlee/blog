@@ -1,0 +1,25 @@
+<aside class="site-directory" aria-label="站点目录">
+  <div class="sidebar-sticky">
+    <div class="directory-heading">
+      <div><p class="sidebar-eyebrow">EXPLORE / 站点目录</p><h2>浏览博客</h2></div>
+      <button class="directory-toggle" type="button" aria-expanded="false" aria-controls="directory-links"><span class="directory-toggle-label">展开目录</span><span aria-hidden="true">⌄</span></button>
+    </div>
+    <nav id="directory-links" class="directory-links" aria-label="博客目录">
+      <a class="directory-link<%= is_home() ? ' active' : '' %>" href="<%- url_for('/') %>"><span>首页概览</span><span aria-hidden="true">↗</span></a>
+      <a class="directory-link<%= is_archive() ? ' active' : '' %>" href="<%- url_for('/archives/') %>"><span>全部文章</span><span><%= site.posts.length %></span></a>
+      <div class="directory-group">
+        <p class="directory-group-title">主题分类</p>
+        <% site.categories.sort('name').each(function(category) { %>
+          <a class="directory-link directory-subitem<%= is_category() && page.category === category.name ? ' active' : '' %>" href="<%- url_for(category.path) %>"><span><%= category.name %></span><span><%= category.posts.length %></span></a>
+        <% }) %>
+      </div>
+      <div class="directory-group">
+        <p class="directory-group-title">最近文章</p>
+        <% site.posts.sort('date', -1).limit(4).each(function(post) { %>
+          <a class="directory-article<%= is_post() && page.path === post.path ? ' active' : '' %>" href="<%- url_for(post.path) %>"><%= post.title %></a>
+        <% }) %>
+      </div>
+      <a class="directory-link directory-about<%= page.path === 'about/index.html' ? ' active' : '' %>" href="<%- url_for('/about/') %>"><span>关于 Kiwi</span><span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+</aside>

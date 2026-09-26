@@ -1,0 +1,30 @@
+<% const pageToc = (is_post() || page.path === 'about/index.html') ? toc(page.content, {list_number: false, min_depth: 2, max_depth: 3}) : ''; %>
+<aside class="content-navigation" aria-label="内容导航">
+  <div class="sidebar-sticky">
+    <p class="sidebar-eyebrow">ON THIS PAGE / 本页</p>
+    <h2>内容导航</h2>
+    <% if (pageToc) { %>
+      <nav class="sidebar-toc" aria-label="本页目录"><%- pageToc %></nav>
+    <% } else if (is_home() && (!page.current || page.current === 1)) { %>
+      <nav class="sidebar-section-links" aria-label="首页内容导航">
+        <a href="#home-title">博客介绍</a>
+        <a href="#topics-heading">主题分类</a>
+        <a href="#latest-heading">最近更新</a>
+        <a href="#about-heading">关于这里</a>
+      </nav>
+    <% } else if (page.path === 'categories/index.html') { %>
+      <nav class="sidebar-section-links" aria-label="分类导航">
+        <a href="#categories-heading">全部分类</a>
+        <% site.categories.sort('name').each(function(category) { %><a href="<%- url_for(category.path) %>"><%= category.name %></a><% }) %>
+      </nav>
+    <% } else if (page.posts && page.posts.length) { %>
+      <nav class="sidebar-section-links" aria-label="文章导航">
+        <a href="<%= is_home() ? '#latest-heading' : '#archive-heading' %>">当前列表</a>
+        <% page.posts.each(function(post, index) { if (index < 5) { %><a href="<%- url_for(post.path) %>"><%= post.title %></a><% } }) %>
+      </nav>
+    <% } else { %>
+      <nav class="sidebar-section-links" aria-label="浏览导航"><a href="<%- url_for('/archives/') %>">全部文章</a><a href="<%- url_for('/categories/') %>">文章分类</a></nav>
+    <% } %>
+    <a class="sidebar-backtop" href="#top">返回顶部 ↑</a>
+  </div>
+</aside>

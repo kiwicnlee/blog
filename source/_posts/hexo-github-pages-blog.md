@@ -1,7 +1,7 @@
 ---
 title: 从 Hexo 到 GitHub Pages：个人博客搭建与发布总结
 date: 2026-09-26 16:21:00
-description: 以机器人博客为例，梳理 Hexo 写作、项目站点路径配置、GitHub Actions 构建和 GitHub Pages 发布的完整流程。
+description: 以 kiwi 的个人博客为例，梳理 Hexo 写作、项目站点路径配置、GitHub Actions 构建和 GitHub Pages 发布的完整流程。
 categories:
   - 机器人技术
 tags:
@@ -10,7 +10,7 @@ tags:
   - 博客搭建
 ---
 
-个人博客可以拆成两件事：用 **Hexo** 把 Markdown 文章生成静态网页，再用 **GitHub Pages** 托管生成的网站。本文以「机器人博客」为例，总结从本地写作到线上发布的关键步骤。
+个人博客可以拆成两件事：用 **Hexo** 把 Markdown 文章生成静态网页，再用 **GitHub Pages** 托管生成的网站。本文以「kiwi的个人博客」为例，总结从本地写作到线上发布的关键步骤。
 
 <!-- more -->
 
@@ -53,7 +53,7 @@ pnpm run server --ip 127.0.0.1
 Hexo 的根目录 `_config.yml` 管站点标题、网址、文章链接和主题；`themes/atelier/_config.yml` 管本站首页文案。本站仓库名为 `blog`，因此属于 GitHub Pages 的**项目站点**，网址带有 `/blog/` 子路径。关键配置是：
 
 ```yaml
-title: 机器人博客
+title: kiwi的个人博客
 url: https://kiwicnlee.github.io/blog/
 theme: atelier
 ```

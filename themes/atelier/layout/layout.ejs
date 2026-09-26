@@ -9,12 +9,17 @@
   <meta name="description" content="<%= page.description || config.description %>">
   <link rel="icon" href="<%- url_for('/favicon.svg') %>" type="image/svg+xml">
   <link rel="stylesheet" href="<%- url_for('/css/style.css') %>">
+  <link rel="stylesheet" href="<%- url_for('/css/three-column.css') %>">
 </head>
 <body>
   <a class="skip-link" href="#main">跳转到正文</a>
   <div class="site-shell">
     <%- partial('_partial/header') %>
-    <main id="main"><%- body %></main>
+    <div class="content-shell">
+      <%- partial('_partial/site-directory') %>
+      <main id="main" class="page-main"><%- body %></main>
+      <%- partial('_partial/content-navigation') %>
+    </div>
     <%- partial('_partial/footer') %>
   </div>
   <script src="<%- url_for('/js/site.js') %>" defer></script>

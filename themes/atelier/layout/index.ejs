@@ -23,7 +23,7 @@
       </a>
     <% } %>
   </section>
-  <nav class="topic-rail container" aria-label="按主题阅读">
+  <nav id="topics-heading" class="topic-rail container" aria-label="按主题阅读">
     <a href="<%- url_for('/categories/机器人技术/') %>"><span class="topic-marker technical"></span><span><small>01 / ENGINEERING</small><strong>机器人与技术</strong></span><b aria-hidden="true">↗</b></a>
     <a href="<%- url_for('/categories/生活随笔/') %>"><span class="topic-marker everyday"></span><span><small>02 / EVERYDAY</small><strong>生活与随笔</strong></span><b aria-hidden="true">↗</b></a>
   </nav>
@@ -43,5 +43,5 @@
   <% } else { %><p class="empty-state">第一篇文章正在路上。稍后再来看看吧。</p><% } %>
 </section>
 <% if (firstPage) { %>
-  <section class="closing-note"><div class="container closing-inner"><div><p class="section-label">ABOUT THIS JOURNAL / 关于这里</p><h2>把每一次探索，写成下一次出发的线索。</h2></div><a href="<%- url_for('/about/') %>">了解这个博客 <span aria-hidden="true">↗</span></a></div></section>
+  <section id="about-heading" class="closing-note"><div class="container closing-inner"><div><p class="section-label">ABOUT THIS JOURNAL / 关于这里</p><h2>把每一次探索，写成下一次出发的线索。</h2></div><a href="<%- url_for('/about/') %>">了解这个博客 <span aria-hidden="true">↗</span></a></div></section>
 <% } %>

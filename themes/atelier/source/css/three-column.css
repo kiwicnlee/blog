@@ -1,0 +1,123 @@
+/* Site frame: top navigation, directory, reading column, page navigation. */
+.site-header { position: sticky; top: 0; z-index: 50; }
+.site-header .container, .site-footer .container { width: min(1480px, calc(100% - 48px)); }
+.content-shell {
+  width: min(1480px, calc(100% - 48px));
+  min-height: calc(100vh - 84px);
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr) 220px;
+  align-items: start;
+  gap: 24px;
+  margin-inline: auto;
+}
+.page-main { min-width: 0; min-height: calc(100vh - 84px); padding-inline: 28px; border-inline: 1px solid var(--line); background: var(--surface); }
+.page-main .container { width: 100%; margin-inline: 0; }
+.sidebar-sticky { position: sticky; top: 110px; max-height: calc(100vh - 125px); overflow-y: auto; scrollbar-width: thin; }
+.site-directory, .content-navigation { min-width: 0; padding-block: 33px 42px; }
+.sidebar-eyebrow { margin: 0; color: #5d6f76; font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: .08em; }
+.directory-heading h2, .content-navigation h2 { margin: 7px 0 19px; font-family: var(--serif); font-size: 22px; line-height: 1.35; }
+.directory-toggle { display: none; }
+.directory-links { border-top: 1px solid var(--line); padding-top: 11px; }
+.directory-link { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 10px; border-radius: 5px; color: #41545d; font-size: 13px; font-weight: 700; }
+.directory-link > span:last-child { flex: none; color: #73858b; font-family: var(--mono); font-size: 11px; font-weight: 500; }
+.directory-link:hover, .directory-link.active { background: #e6edeb; color: var(--accent); }
+.directory-group { margin-top: 20px; padding-top: 17px; border-top: 1px solid var(--line); }
+.directory-group-title { margin: 0 10px 8px; color: #5d6f76; font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: .1em; }
+.directory-subitem { padding-left: 20px; font-weight: 500; }
+.directory-article { display: -webkit-box; margin: 0 9px; padding: 8px 1px; overflow: hidden; color: #435962; font-size: 12px; line-height: 1.6; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.directory-article:hover, .directory-article.active { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+.directory-about { margin-top: 20px; border-top: 1px solid var(--line); border-radius: 0; padding-top: 19px; }
+.content-navigation .sidebar-sticky { padding-left: 15px; border-left: 1px solid var(--line); }
+.content-navigation h2 { margin-bottom: 21px; }
+.sidebar-toc ol { margin: 0; padding: 0; list-style: none; }
+.sidebar-toc ol ol { margin-top: 5px; padding-left: 13px; }
+.sidebar-toc li { margin: 0 0 9px; }
+.sidebar-toc a, .sidebar-section-links a { display: block; padding: 4px 0; color: #52656d; font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+.sidebar-toc a:hover, .sidebar-section-links a:hover { color: var(--accent); }
+.sidebar-section-links { display: grid; gap: 7px; }
+.sidebar-backtop { display: inline-block; margin-top: 24px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--accent); font-size: 11px; font-weight: 700; }
+
+/* Give the reading column its own rhythm. */
+.page-main .home-intro { gap: 28px; padding-block: 55px 45px; }
+.page-main .home-intro h1 { font-size: clamp(42px, 3.7vw, 56px); }
+.page-main .intro-description { font-size: 14px; }
+.page-main .lead-story { min-height: 330px; padding: 25px; }
+.page-main .lead-title { font-size: clamp(24px, 2.1vw, 31px); }
+.page-main .topic-rail a { padding-inline: 16px; }
+.page-main .posts-section { padding-block: 59px 89px; }
+.page-main .section-head h2 { font-size: 38px; }
+.page-main .post-card-link { grid-template-columns: 38px minmax(0, 1fr) 25px; gap: 17px; }
+.page-main .card-title { font-size: 21px; }
+.page-main .closing-inner { min-height: 155px; }
+.page-main .closing-inner h2 { font-size: 25px; }
+.page-main .page-banner { padding-block: 56px 42px; }
+.page-main .page-banner h1 { font-size: clamp(38px, 4vw, 53px); }
+.page-main .category-card { min-height: 170px; }
+.page-main .post-page { padding-block: 52px 95px; }
+.page-main .post-header, .page-main .post-divider, .page-main .post-page > .prose, .page-main .post-end { max-width: 760px; }
+.page-main .post-header h1 { font-size: clamp(36px, 4vw, 53px); }
+.page-main .post-divider { margin-block: 41px 34px; }
+.page-main .prose-page { padding-block: 43px 90px; }
+.page-main .prose-page .prose { max-width: 760px; }
+.page-main .archive-item { gap: 15px; }
+.page-main .archive-item h2 { font-size: 21px; }
+#home-title, #topics-heading, #latest-heading, #about-heading, #categories-heading, #archive-heading,
+.page-main .prose h2, .page-main .prose h3 { scroll-margin-top: 112px; }
+
+/* The desktop table of contents moves into the right rail. */
+.mobile-content-toc { display: none; }
+.mobile-content-toc summary { cursor: pointer; }
+.mobile-content-toc summary::-webkit-details-marker { display: none; }
+.mobile-content-toc ol { margin: 0; padding: 0; list-style: none; }
+.mobile-content-toc ol ol { padding-left: 16px; }
+.mobile-content-toc li { margin: 8px 0; }
+.mobile-content-toc a { color: var(--accent); font-size: 13px; line-height: 1.55; }
+
+@media (max-width: 1370px) {
+  .page-main .home-intro { grid-template-columns: 1fr; gap: 27px; }
+  .page-main .intro-footnote { padding-top: 27px; }
+  .page-main .lead-story { min-height: 265px; }
+}
+
+@media (max-width: 1180px) {
+  .content-shell { grid-template-columns: 205px minmax(0, 1fr); }
+  .content-navigation { display: none; }
+  .mobile-content-toc { display: block; max-width: 760px; margin: 0 0 27px; border: 1px solid var(--line); border-radius: 5px; background: var(--soft); }
+  .mobile-content-toc summary { display: flex; justify-content: space-between; align-items: center; padding: 12px 17px; color: var(--ink); font-size: 13px; font-weight: 800; list-style: none; }
+  .mobile-content-toc[open] summary { border-bottom: 1px solid var(--line); }
+  .mobile-content-toc nav { padding: 8px 17px 14px; }
+}
+
+@media (max-width: 860px) {
+  .site-header .container, .site-footer .container { width: min(100% - 40px, 640px); }
+  .content-shell { display: block; width: 100%; min-height: 0; }
+  .site-directory { padding: 0 20px; border-bottom: 1px solid var(--line); }
+  .site-directory .sidebar-sticky { position: static; max-height: none; overflow: visible; }
+  .directory-heading { min-height: 57px; display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+  .directory-heading h2 { margin: 0; font-family: var(--sans); font-size: 13px; }
+  .directory-heading .sidebar-eyebrow { display: none; }
+  .directory-toggle { display: inline-flex; align-items: center; gap: 8px; padding: 8px 0; border: 0; background: transparent; color: var(--accent); font-size: 12px; font-weight: 700; cursor: pointer; }
+  .directory-toggle > span:last-child { font-size: 18px; transition: transform .2s; }
+  .directory-toggle[aria-expanded="true"] > span:last-child { transform: rotate(180deg); }
+  .directory-links { display: none; max-width: 640px; margin-inline: auto; padding: 11px 0 20px; }
+  .directory-links.is-open { display: block; }
+  .page-main { min-height: 0; padding-inline: 20px; border: 0; }
+  .page-main > * { max-width: 640px; margin-inline: auto; }
+  .page-main .home-intro { padding-top: 47px; }
+  .page-main .posts-section { padding-bottom: 76px; }
+  .page-main .post-page { padding-block: 43px 82px; }
+  .page-main .post-header h1 { font-size: clamp(34px, 6vw, 47px); }
+}
+
+@media (max-width: 540px) {
+  .page-main .home-intro { padding-block: 42px 30px; }
+  .page-main .home-intro h1 { font-size: 38px; }
+  .page-main .lead-story { min-height: 275px; }
+  .page-main .topic-rail { grid-template-columns: 1fr; }
+  .page-main .topic-rail a:first-child { border-right: 0; border-bottom: 1px solid var(--line); }
+  .page-main .post-card-link { grid-template-columns: 27px minmax(0, 1fr) 19px; gap: 9px; }
+  .page-main .card-title { font-size: 19px; }
+  .page-main .section-head h2 { font-size: 34px; }
+  .page-main .page-banner h1 { font-size: 37px; }
+  .page-main .post-header h1 { font-size: 34px; }
+}

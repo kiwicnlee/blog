@@ -3,11 +3,11 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: 机器人博客
+title: kiwi的个人博客
 subtitle: 记录机器人技术，也记录生活
-description: 一个关于机器人技术、日常观察与持续学习的个人空间。
-keywords: 机器人,技术,生活,笔记,个人博客
-author: 博主
+description: Kiwi 的个人博客，记录机器人技术、日常观察与持续学习。
+keywords: Kiwi,机器人,技术,生活,笔记,个人博客
+author: kiwi
 language: zh-CN
 timezone: Asia/Shanghai
 
