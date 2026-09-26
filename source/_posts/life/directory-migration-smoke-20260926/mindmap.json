@@ -1,0 +1,15 @@
+{
+  "nodeData": {
+    "id": "root",
+    "topic": "测试",
+    "expanded": true,
+    "children": [
+      {
+        "id": "child",
+        "topic": "子节点",
+        "expanded": true,
+        "children": []
+      }
+    ]
+  }
+}
