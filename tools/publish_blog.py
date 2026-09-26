@@ -58,6 +58,9 @@ class GitHub:
 
     def request(self, method, path, payload=None):
         data = None if payload is None else json.dumps(payload, ensure_ascii=False).encode("utf-8")
+        request_path = path
+        if method == "GET":
+            request_path += ("&" if "?" in request_path else "?") + "fresh=" + str(time.time_ns())
         body_file = None
         if data is not None:
             with tempfile.NamedTemporaryFile(prefix="robot-blog-body-", delete=False) as temporary:
@@ -69,10 +72,11 @@ class GitHub:
                 'url = "https://api.github.com{}"\n'
                 'request = "{}"\n'
                 'header = "Accept: application/vnd.github+json"\n'
+                'header = "Cache-Control: no-cache"\n'
                 'header = "Content-Type: application/json"\n'
                 'header = "User-Agent: kiwicnlee-blog-publisher"\n'
                 'header = "X-GitHub-Api-Version: 2022-11-28"\n'
-            ).format(path, method)
+            ).format(request_path, method)
             if self.token:
                 config += 'header = "Authorization: Bearer {}"\n'.format(self.token)
             if body_file:
