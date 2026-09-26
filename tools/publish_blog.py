@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parent.parent
 REPOSITORY = "kiwicnlee/blog"
 BRANCH = "main"
 API_BASE = "/repos/" + REPOSITORY
-MANAGED_DIRS = (".github", "scaffolds", "source", "themes", "tools")
+MANAGED_DIRS = (".github", "editor", "scaffolds", "source", "themes", "tools")
 ROOT_FILES = {
     ".gitignore",
     "README.md",
@@ -29,8 +29,8 @@ ROOT_FILES = {
     "pnpm-lock.yaml",
     "pulish.sh",
 }
-SKIP_DIRS = {".agents", ".codex", ".git", "__pycache__", "node_modules", "public"}
-SKIP_FILES = {".DS_Store", "Thumbs.db", "db.json"}
+SKIP_DIRS = {".agents", ".codex", ".git", ".wrangler", "__pycache__", "node_modules"}
+SKIP_FILES = {".DS_Store", ".dev.vars", "Thumbs.db", "db.json"}
 MAX_FILE_SIZE = 20 * 1024 * 1024
 
 
@@ -114,7 +114,7 @@ def managed_path(path):
 
 def skip_path(path):
     parts = Path(path).parts
-    return any(part in SKIP_DIRS or part.startswith(".deploy") for part in parts) or (
+    return path == "editor/dist" or path.startswith("editor/dist/") or any(part in SKIP_DIRS or part.startswith(".deploy") for part in parts) or (
         parts[-1] in SKIP_FILES or parts[-1].endswith((".log", ".pyc"))
     )
 
@@ -129,7 +129,15 @@ def local_files():
     for folder in MANAGED_DIRS:
         base = ROOT / folder
         if base.is_dir():
-            candidates.extend(base.rglob("*"))
+            for current, directories, filenames in os.walk(base, topdown=True, followlinks=False):
+                for name in list(directories):
+                    path = Path(current) / name
+                    relative = path.relative_to(ROOT).as_posix()
+                    if skip_path(relative):
+                        directories.remove(name)
+                    elif path.is_symlink():
+                        fail("拒绝发布符号链接：" + relative)
+                candidates.extend(Path(current) / name for name in filenames)
 
     for path in candidates:
         relative = path.relative_to(ROOT).as_posix()

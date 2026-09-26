@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f8f6">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>写作后台 · kiwi的个人博客</title>
+</head>
+<body>
+  <div id="app">
+    <header class="admin-header">
+      <a class="admin-brand" href="https://kiwicnlee.github.io/blog/" target="_blank" rel="noopener noreferrer"><span class="admin-mark">K<span>.</span></span><span>kiwi的个人博客<small>写作后台</small></span></a>
+      <div class="admin-user"><span id="account-name"></span><button id="logout-button" type="button" hidden>退出登录</button></div>
+    </header>
+    <section id="login-view" class="login-view" hidden>
+      <p class="eyebrow">KIWI / EDITORIAL DESK</p>
+      <h1>记录想法，<br>一起把文章写清楚。</h1>
+      <p>受邀作者使用 GitHub 账号登录。草稿会进入审核 PR，合并后才在公开博客显示。</p>
+      <a class="primary-action" href="/auth/login">使用 GitHub 登录 <span aria-hidden="true">↗</span></a>
+    </section>
+    <div id="workspace" class="workspace" hidden>
+      <aside class="draft-sidebar" aria-label="草稿列表">
+        <div class="sidebar-head"><div><small>EDITORIAL WORKFLOW</small><h2>文章草稿</h2></div><button id="new-button" type="button">新建</button></div>
+        <div id="draft-list" class="draft-list"></div>
+        <p class="draft-help">保存会创建或更新草稿 PR。发布由仓库所有者审核合并。</p>
+      </aside>
+      <main class="editor-main">
+        <div class="editor-heading"><div><p class="eyebrow">WRITE / PREVIEW / REVIEW</p><h1 id="editor-title">新建文章</h1></div><a id="pr-link" href="#" target="_blank" rel="noopener noreferrer" hidden>查看草稿 PR ↗</a></div>
+        <form id="post-form">
+          <div class="field-grid">
+            <label class="field field-wide">文章标题<input id="post-title" name="title" required maxlength="120" placeholder="为文章起一个清晰的标题"></label>
+            <label class="field">英文路径<input id="post-slug" name="slug" required pattern="[a-z0-9-]+" placeholder="my-new-post"><small>保存草稿后不可更改。</small></label>
+            <label class="field">日期<input id="post-date" name="date" type="datetime-local" required></label>
+            <label class="field field-wide">摘要<textarea id="post-description" name="description" maxlength="300" rows="2" placeholder="用一两句话说明文章内容"></textarea></label>
+            <label class="field">分类<select id="post-category" name="category"><option value="机器人技术">机器人技术</option><option value="生活随笔">生活随笔</option></select></label>
+            <label class="field">标签<input id="post-tags" name="tags" placeholder="多个标签用逗号分隔"></label>
+          </div>
+          <div class="editor-section-head"><div><h2>正文</h2><p>支持 Markdown 与可视化模式切换；图片会随文章草稿保存。</p></div><label class="secondary-action image-button">插入图片<input id="image-upload" type="file" accept="image/png,image/jpeg,image/webp" multiple hidden></label></div>
+          <div id="markdown-editor"></div>
+          <div class="editor-section-head map-heading"><div><h2>思维导图</h2><p>拖拽整理节点；保存时会生成可继续编辑的数据和文章插图。</p></div><div class="map-actions"><button id="map-toggle" class="secondary-action" type="button">打开导图编辑器</button><button id="map-clear" class="text-action" type="button" hidden>移除导图</button></div></div>
+          <div id="mindmap-panel" class="mindmap-panel" hidden><p class="map-hint">点击节点可编辑，使用工具栏添加子节点。正文中写 <code>&lt;!-- mindmap --&gt;</code> 可指定插图位置。</p><div id="mindmap-canvas"></div></div>
+          <div class="save-row"><p id="status" role="status" aria-live="polite"></p><button id="save-button" class="primary-action" type="submit">保存草稿并创建 PR <span aria-hidden="true">↗</span></button></div>
+        </form>
+      </main>
+    </div>
+  </div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

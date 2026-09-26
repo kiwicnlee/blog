@@ -54,6 +54,7 @@
 .page-main .page-banner h1 { font-size: clamp(38px, 4vw, 53px); }
 .page-main .category-card { min-height: 170px; }
 .page-main .post-page { padding-block: 52px 95px; }
+.page-main .post-meta { flex-wrap: wrap; }
 .page-main .post-header, .page-main .post-divider, .page-main .post-page > .prose, .page-main .post-end { max-width: 760px; }
 .page-main .post-header h1 { font-size: clamp(36px, 4vw, 53px); }
 .page-main .post-divider { margin-block: 41px 34px; }
