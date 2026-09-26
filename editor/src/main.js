@@ -101,6 +101,7 @@ function resetPost() {
   $('#post-form').reset();
   $('#post-date').value = localDateTime();
   $('#post-slug').readOnly = false;
+  $('#post-category').disabled = false;
   state.editor.setValue('');
   $('#editor-title').textContent = '新建文章';
   $('#save-button').firstChild.textContent = '保存草稿并创建 PR ';
@@ -129,6 +130,7 @@ async function openDraft(number) {
     $('#post-date').value = String(meta.date || '').replace(' ', 'T').slice(0, 16);
     $('#post-description').value = meta.description || '';
     $('#post-category').value = meta.categories?.[0] || '机器人技术';
+    $('#post-category').disabled = true;
     $('#post-tags').value = (meta.tags || []).join(', ');
     state.editor.setValue(body.replace(/!\[文章思维导图\]\(mindmap\.svg\)/, '<!-- mindmap -->'));
     $('#editor-title').textContent = '编辑草稿';
@@ -199,6 +201,7 @@ async function savePost(event) {
     state.prUrl = result.url;
     state.attachments = [];
     $('#post-slug').readOnly = true;
+    $('#post-category').disabled = true;
     $('#editor-title').textContent = '编辑草稿';
     $('#save-button').firstChild.textContent = '更新草稿 PR ';
     $('#pr-link').href = result.url;

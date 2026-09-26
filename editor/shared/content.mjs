@@ -1,4 +1,5 @@
-export const CATEGORIES = ['机器人技术', '生活随笔'];
+export const CATEGORY_DIRECTORIES = { '机器人技术': 'tech', '生活随笔': 'life' };
+export const CATEGORIES = Object.keys(CATEGORY_DIRECTORIES);
 const SLUG = /^[a-z0-9](?:[a-z0-9-]{0,78}[a-z0-9])?$/;
 const NODE_ID = /^[A-Za-z0-9_-]{1,80}$/;
 const MAX_MAP_NODES = 120;
@@ -64,7 +65,7 @@ export function validateDraft(input, author) {
       day > new Date(Date.UTC(year, month, 0)).getUTCDate() || hour > 23 || minute > 59 || second > 59) {
     throw new Error('日期数值不正确');
   }
-  return { title, slug, description, category, tags, body: input.body, author: writer, date, mindmap: validateMindmap(input.mindmap) };
+  return { title, slug, description, category, directory: CATEGORY_DIRECTORIES[category], tags, body: input.body, author: writer, date, mindmap: validateMindmap(input.mindmap) };
 }
 
 export function serializePost(draft) {

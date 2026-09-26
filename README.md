@@ -24,8 +24,9 @@ pnpm run build
 - 站点名称、副标题、作者与站点地址：编辑 `_config.yml`。
 - 首页主标题和简介：编辑 `themes/atelier/_config.yml`。
 - 关于页：编辑 `source/about/index.md`。
-- 文章：编辑或删除 `source/_posts/` 中的示例文章；新建文章运行 `pnpm exec hexo new "文章标题"`。
-- 文章图片：新建文章后，将图片放进同名资源文件夹，在 Markdown 中使用 `![说明](图片名.jpg)`。例如 `source/_posts/my-note.md` 的图片放在 `source/_posts/my-note/`。
+- 文章：`source/_posts/tech/` 放机器人技术，`source/_posts/life/` 放生活随笔；文章的 Front-matter `categories` 仍要与目录对应。左栏分组名称和顺序由 `source/_data/navigation.yml` 设置。在线后台会按所选分类自动放入对应目录。
+- 文章图片：放在文章同名资源文件夹，在 Markdown 中使用 `![说明](图片名.jpg)`。例如 `source/_posts/tech/my-note.md` 的图片放在 `source/_posts/tech/my-note/`。
+- 文章链接：`_config.yml` 使用 `:name` 生成路径，移动现有文章到分类目录后，已发布的 URL 保持不变；不同目录中的文章文件名应保持全站唯一。
 - 样式：编辑 `themes/atelier/source/css/style.css`。
 
 ## 发布到 GitHub Pages

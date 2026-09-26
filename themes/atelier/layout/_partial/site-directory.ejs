@@ -8,16 +8,33 @@
       <a class="directory-link<%= is_home() ? ' active' : '' %>" href="<%- url_for('/') %>"><span>首页概览</span><span aria-hidden="true">↗</span></a>
       <a class="directory-link<%= is_archive() ? ' active' : '' %>" href="<%- url_for('/archives/') %>"><span>全部文章</span><span><%= site.posts.length %></span></a>
       <div class="directory-group">
-        <p class="directory-group-title">主题分类</p>
-        <% site.categories.sort('name').each(function(category) { %>
-          <a class="directory-link directory-subitem<%= is_category() && page.category === category.name ? ' active' : '' %>" href="<%- url_for(category.path) %>"><span><%= category.name %></span><span><%= category.posts.length %></span></a>
-        <% }) %>
-      </div>
-      <div class="directory-group">
-        <p class="directory-group-title">最近文章</p>
-        <% site.posts.sort('date', -1).limit(4).each(function(post) { %>
-          <a class="directory-article<%= is_post() && page.path === post.path ? ' active' : '' %>" href="<%- url_for(post.path) %>"><%= post.title %></a>
-        <% }) %>
+        <p class="directory-group-title">文档目录</p>
+        <% const sections = site.data.navigation.sections;
+           const assigned = new Set();
+           sections.forEach(function(section) {
+             const prefix = '_posts/' + section.directory + '/';
+             const posts = site.posts.data.filter(post => post.source.startsWith(prefix)).sort((a, b) => b.date.valueOf() - a.date.valueOf());
+             posts.forEach(post => assigned.add(post.source));
+        %>
+          <details class="directory-section" open>
+            <summary class="directory-section-heading<%= (is_post() && page.source.startsWith(prefix)) || (is_category() && page.category === section.category) ? ' active' : '' %>"><span><%= section.title %></span><span class="directory-section-count"><%= posts.length %> 篇 <span aria-hidden="true">⌄</span></span></summary>
+            <div class="directory-section-posts">
+              <% posts.forEach(function(post) { %>
+                <a class="directory-article<%= is_post() && page.path === post.path ? ' active' : '' %>" href="<%- url_for(post.path) %>"<% if (is_post() && page.path === post.path) { %> aria-current="page"<% } %>><%= post.title %></a>
+              <% }) %>
+              <a class="directory-section-more" href="<%- url_for('/categories/' + section.category + '/') %>">查看该分类全部文章 →</a>
+            </div>
+          </details>
+        <% });
+           const unassigned = site.posts.data.filter(post => !assigned.has(post.source)).sort((a, b) => b.date.valueOf() - a.date.valueOf());
+           if (unassigned.length) { %>
+          <details class="directory-section" open>
+            <summary class="directory-section-heading"><span>其他文章</span><span class="directory-section-count"><%= unassigned.length %> 篇 <span aria-hidden="true">⌄</span></span></summary>
+            <div class="directory-section-posts">
+              <% unassigned.forEach(function(post) { %><a class="directory-article<%= is_post() && page.path === post.path ? ' active' : '' %>" href="<%- url_for(post.path) %>"><%= post.title %></a><% }) %>
+            </div>
+          </details>
+        <% } %>
       </div>
       <a class="directory-link directory-about<%= page.path === 'about/index.html' ? ' active' : '' %>" href="<%- url_for('/about/') %>"><span>关于 Kiwi</span><span aria-hidden="true">↗</span></a>
     </nav>

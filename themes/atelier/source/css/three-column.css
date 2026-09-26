@@ -26,6 +26,17 @@
 .directory-subitem { padding-left: 20px; font-weight: 500; }
 .directory-article { display: -webkit-box; margin: 0 9px; padding: 8px 1px; overflow: hidden; color: #435962; font-size: 12px; line-height: 1.6; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .directory-article:hover, .directory-article.active { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+.directory-section { border-bottom: 1px solid var(--line); }
+.directory-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 10px; color: #324a50; font-size: 13px; font-weight: 700; cursor: pointer; list-style: none; }
+.directory-section-heading::-webkit-details-marker { display: none; }
+.directory-section-heading:hover, .directory-section-heading.active { color: var(--accent); }
+.directory-section-count { flex: none; color: #73858b; font-size: 11px; font-weight: 500; }
+.directory-section-count > span { display: inline-block; margin-left: 3px; transition: transform .2s; }
+.directory-section:not([open]) .directory-section-count > span { transform: rotate(-90deg); }
+.directory-section-posts { margin: 0 0 12px 15px; padding-left: 11px; border-left: 1px solid var(--line); }
+.directory-section-posts .directory-article { margin: 0; padding: 7px 8px; border-radius: 4px; }
+.directory-section-posts .directory-article.active { background: #e6edeb; font-weight: 700; text-decoration: none; }
+.directory-section-more { display: block; padding: 8px; color: var(--accent); font-size: 11px; font-weight: 700; }
 .directory-about { margin-top: 20px; border-top: 1px solid var(--line); border-radius: 0; padding-top: 19px; }
 .content-navigation .sidebar-sticky { padding-left: 15px; border-left: 1px solid var(--line); }
 .content-navigation h2 { margin-bottom: 21px; }

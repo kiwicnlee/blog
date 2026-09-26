@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createVerify, generateKeyPairSync } from 'node:crypto';
-import { createDraft, loadDraft, signAppJwt, validateAttachments } from '../worker/github.mjs';
+import { createDraft, loadDraft, signAppJwt, updateDraft, validateAttachments } from '../worker/github.mjs';
 import { validateDraft } from '../shared/content.mjs';
 
 test('draft creation writes only a cms branch and opens a PR against main', async () => {
@@ -11,7 +11,7 @@ test('draft creation writes only a cms branch and opens a PR against main', asyn
     const body = options.body ? JSON.parse(options.body) : null;
     calls.push({ path, method: options.method, body });
     let result;
-    if (path.endsWith('/contents/source/_posts/team-post.md')) {
+    if (path.includes('/contents/source/_posts/') && path.endsWith('/team-post.md')) {
       return new Response(JSON.stringify({ message: 'Not Found' }), { status: 404, headers: { 'Content-Type': 'application/json' } });
     }
     if (path.endsWith('/git/ref/heads/main')) result = { object: { sha: 'main-head' } };
@@ -27,23 +27,40 @@ test('draft creation writes only a cms branch and opens a PR against main', asyn
     else throw new Error(`Unexpected request: ${options.method} ${path}`);
     return new Response(JSON.stringify(result), { status: 200, headers: { 'Content-Type': 'application/json' } });
   };
-  const draft = validateDraft({ title: '协作文章', slug: 'team-post', category: '生活随笔', tags: [], body: '正文' }, 'alice');
+  const draft = validateDraft({ title: '协作文章', slug: 'team-post', category: '生活随笔', tags: [], body: '正文', mindmap: { nodeData: { id: 'root', topic: '中心', children: [] } } }, 'alice');
   const result = await createDraft(draft, [], 'test-token', fakeFetch);
   assert.equal(result.number, 7);
-  assert.match(result.branch, /^cms\/alice\/team-post-[a-f0-9]{8}$/);
+  assert.match(result.branch, /^cms\/alice\/life\/team-post-[a-f0-9]{8}$/);
+  assert.deepEqual(calls.find(call => call.path.endsWith('/git/trees')).body.tree.map(item => item.path), [
+    'source/_posts/life/team-post.md',
+    'source/_posts/life/team-post/mindmap.json',
+    'source/_posts/life/team-post/mindmap.svg',
+  ]);
   assert.equal(calls.find(call => call.path.endsWith('/pulls') && call.method === 'POST').body.base, 'main');
   assert.equal(calls.some(call => call.method === 'PATCH' && call.path.endsWith('/git/refs/heads/main')), false);
 });
 
-test('existing published slug is rejected before a draft branch is created', async () => {
+test('existing published slug in another category is rejected before creating a branch', async () => {
   const methods = [];
-  const fakeFetch = async (_url, options) => {
+  const fakeFetch = async (url, options) => {
     methods.push(options.method);
+    if (new URL(url).pathname.endsWith('/source/_posts/team-post.md')) {
+      return new Response(JSON.stringify({ message: 'Not Found' }), { status: 404, headers: { 'Content-Type': 'application/json' } });
+    }
     return new Response(JSON.stringify({ path: 'source/_posts/team-post.md' }), { status: 200, headers: { 'Content-Type': 'application/json' } });
   };
   const draft = validateDraft({ title: '协作文章', slug: 'team-post', category: '生活随笔', tags: [], body: '正文' }, 'alice');
   await assert.rejects(createDraft(draft, [], 'test-token', fakeFetch), /路径已被已发布文章占用/);
-  assert.deepEqual(methods, ['GET']);
+  assert.deepEqual(methods, ['GET', 'GET']);
+});
+
+test('editing a draft cannot move it to another category directory', async () => {
+  const draft = validateDraft({ title: '测试', slug: 'team-post', category: '生活随笔', tags: [], body: '正文' }, 'alice');
+  const fakeFetch = async url => {
+    if (!new URL(url).pathname.endsWith('/pulls/8')) throw new Error('Unexpected GitHub write');
+    return Response.json({ state: 'open', base: { ref: 'main' }, head: { ref: 'cms/alice/tech/team-post-1234abcd', repo: { full_name: 'kiwicnlee/blog' } } });
+  };
+  await assert.rejects(updateDraft(8, draft, [], 'test-token', fakeFetch), /分类不能在草稿创建后更改/);
 });
 
 test('GitHub App JWT signs with either downloaded PKCS#1 or PKCS#8 private keys', async () => {
@@ -71,8 +88,8 @@ test('loading a draft decodes Chinese Markdown and optional map data', async () 
     const path = new URL(url).pathname;
     let data;
     let status = 200;
-    if (path.endsWith('/pulls/7')) data = { state: 'open', base: { ref: 'main' }, head: { ref: 'cms/alice/team-post-1234abcd', repo: { full_name: 'kiwicnlee/blog' } }, html_url: 'https://github.com/kiwicnlee/blog/pull/7' };
-    else if (path.endsWith('/team-post.md')) data = { content: encoded };
+    if (path.endsWith('/pulls/7')) data = { state: 'open', base: { ref: 'main' }, head: { ref: 'cms/alice/life/team-post-1234abcd', repo: { full_name: 'kiwicnlee/blog' } }, html_url: 'https://github.com/kiwicnlee/blog/pull/7' };
+    else if (path.endsWith('/life/team-post.md')) data = { content: encoded };
     else { data = { message: 'Not Found' }; status = 404; }
     return new Response(JSON.stringify(data), { status, headers: { 'Content-Type': 'application/json' } });
   };

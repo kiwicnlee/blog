@@ -4,7 +4,7 @@
 
 ## 当前能力与边界
 
-- 新建文章、编辑仍开放的草稿 PR；表单填写标题、摘要、分类、标签、日期，Vditor 提供 Markdown 分屏和可视化编辑。
+- 新建文章、编辑仍开放的草稿 PR；表单填写标题、摘要、分类、标签、日期，Vditor 提供 Markdown 分屏和可视化编辑。选择「机器人技术」写入 `source/_posts/tech/`，选择「生活随笔」写入 `source/_posts/life/`；草稿创建后分类不可更改。
 - 上传 PNG、JPEG、WebP 图片，单张最多 5 MiB、一次保存总计最多 6 MiB；附件与文章一起提交到文章资源文件夹。
 - Mind Elixir 拖拽编辑树状思维导图；保存 `mindmap.json` 和由服务端安全生成的 `mindmap.svg`。正文的 `<!-- mindmap -->` 会替换成图片，未写该标记时自动附在文末。
 - 本版只新建文章和编辑开放草稿；已发布文章仍通过 GitHub PR 修改。编辑器预览是 Markdown 预览，完整 Hexo 页面由合并后构建验证。
@@ -68,4 +68,4 @@ pnpm run deploy
 
 ## 发布流程
 
-你在后台保存时，Worker 校验输入，生成文章与资源文件，提交到 `cms/kiwicnlee/<文章>-<随机值>` 分支并创建 PR。再次保存会更新原草稿分支。你在 GitHub 检查 Markdown、图片和思维导图，合并到 `main` 后触发 `.github/workflows/pages.yml`。
+你在后台保存时，Worker 校验输入，生成文章与资源文件，提交到 `cms/kiwicnlee/<tech|life>/<文章>-<随机值>` 分支并创建 PR。再次保存会更新原草稿分支。你在 GitHub 检查 Markdown、图片和思维导图，合并到 `main` 后触发 `.github/workflows/pages.yml`。

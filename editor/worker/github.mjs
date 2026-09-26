@@ -1,4 +1,4 @@
-import { renderMindmapSvg, serializePost } from '../shared/content.mjs';
+import { CATEGORY_DIRECTORIES, renderMindmapSvg, serializePost } from '../shared/content.mjs';
 
 const API = 'https://api.github.com';
 const REPO = 'kiwicnlee/blog';
@@ -97,21 +97,30 @@ function branchPath(branch) {
   return branch.split('/').map(encodeURIComponent).join('/');
 }
 
-function validateBranch(branch) {
-  if (typeof branch !== 'string' || !/^cms\/[A-Za-z0-9-]+\/[a-z0-9-]+-[a-f0-9]{8}$/.test(branch)) {
-    throw new Error('草稿分支格式不正确');
-  }
-  return branch;
+function draftLocation(branch) {
+  const match = typeof branch === 'string' && branch.match(/^cms\/([A-Za-z0-9-]+)\/(?:(tech|life)\/)?([a-z0-9-]+)-[a-f0-9]{8}$/);
+  return match ? { author: match[1], directory: match[2] || '', slug: match[3] } : null;
 }
 
-function draftFiles(draft, attachments) {
-  const files = [{ path: `source/_posts/${draft.slug}.md`, bytes: encoder.encode(serializePost(draft)) }];
+function validateBranch(branch) {
+  const location = draftLocation(branch);
+  if (!location) throw new Error('草稿分支格式不正确');
+  return location;
+}
+
+function postPath(directory, slug) {
+  return `source/_posts/${directory ? `${directory}/` : ''}${slug}`;
+}
+
+function draftFiles(draft, attachments, directory) {
+  const base = postPath(directory, draft.slug);
+  const files = [{ path: `${base}.md`, bytes: encoder.encode(serializePost(draft)) }];
   if (draft.mindmap) {
-    files.push({ path: `source/_posts/${draft.slug}/mindmap.json`, bytes: encoder.encode(`${JSON.stringify(draft.mindmap, null, 2)}\n`) });
-    files.push({ path: `source/_posts/${draft.slug}/mindmap.svg`, bytes: encoder.encode(renderMindmapSvg(draft.mindmap)) });
+    files.push({ path: `${base}/mindmap.json`, bytes: encoder.encode(`${JSON.stringify(draft.mindmap, null, 2)}\n`) });
+    files.push({ path: `${base}/mindmap.svg`, bytes: encoder.encode(renderMindmapSvg(draft.mindmap)) });
   }
   for (const attachment of attachments) {
-    files.push({ path: `source/_posts/${draft.slug}/${attachment.name}`, bytes: attachment.bytes });
+    files.push({ path: `${base}/${attachment.name}`, bytes: attachment.bytes });
   }
   return files;
 }
@@ -146,12 +155,12 @@ export function validateAttachments(raw) {
   });
 }
 
-async function commitFiles(branch, draft, attachments, token, fetchImpl) {
+async function commitFiles(branch, draft, attachments, directory, token, fetchImpl) {
   const ref = await githubRequest(`${REPO_PATH}/git/ref/heads/${branchPath(branch)}`, token, { fetchImpl });
   const parent = ref.object.sha;
   const base = await githubRequest(`${REPO_PATH}/git/commits/${parent}`, token, { fetchImpl });
   const entries = [];
-  for (const file of draftFiles(draft, attachments)) {
+  for (const file of draftFiles(draft, attachments, directory)) {
     const blob = await githubRequest(`${REPO_PATH}/git/blobs`, token, {
       method: 'POST', body: { content: base64(file.bytes), encoding: 'base64' }, fetchImpl,
     });
@@ -170,22 +179,24 @@ async function commitFiles(branch, draft, attachments, token, fetchImpl) {
 }
 
 export async function createDraft(draft, attachments, token, fetchImpl = fetch) {
-  try {
-    await githubRequest(`${REPO_PATH}/contents/source/_posts/${draft.slug}.md?ref=main`, token, { fetchImpl });
-    throw new GitHubError(409, '文章路径已被已发布文章占用');
-  } catch (error) {
-    if (!(error instanceof GitHubError && error.status === 404)) throw error;
+  for (const directory of ['', ...Object.values(CATEGORY_DIRECTORIES)]) {
+    try {
+      await githubRequest(`${REPO_PATH}/contents/${postPath(directory, draft.slug)}.md?ref=main`, token, { fetchImpl });
+      throw new GitHubError(409, '文章路径已被已发布文章占用');
+    } catch (error) {
+      if (!(error instanceof GitHubError && error.status === 404)) throw error;
+    }
   }
-  if ((await listDrafts(token, fetchImpl)).some(item => item.branch.split('/')[2].slice(0, -9) === draft.slug)) {
+  if ((await listDrafts(token, fetchImpl)).some(item => draftLocation(item.branch)?.slug === draft.slug)) {
     throw new GitHubError(409, '该文章路径已有待审核草稿');
   }
   const main = await githubRequest(`${REPO_PATH}/git/ref/heads/main`, token, { fetchImpl });
-  const branch = `cms/${draft.author}/${draft.slug}-${crypto.randomUUID().slice(0, 8)}`;
+  const branch = `cms/${draft.author}/${draft.directory}/${draft.slug}-${crypto.randomUUID().slice(0, 8)}`;
   validateBranch(branch);
   await githubRequest(`${REPO_PATH}/git/refs`, token, {
     method: 'POST', body: { ref: `refs/heads/${branch}`, sha: main.object.sha }, fetchImpl,
   });
-  const commit = await commitFiles(branch, draft, attachments, token, fetchImpl);
+  const commit = await commitFiles(branch, draft, attachments, draft.directory, token, fetchImpl);
   const pr = await githubRequest(`${REPO_PATH}/pulls`, token, {
     method: 'POST',
     body: { title: draft.title, head: branch, base: 'main', body: `由 @${draft.author} 在线提交的文章草稿。请审核正文、图片和思维导图后合并。` },
@@ -204,10 +215,9 @@ async function getManagedPull(number, token, fetchImpl) {
 
 export async function updateDraft(number, draft, attachments, token, fetchImpl = fetch) {
   const pr = await getManagedPull(number, token, fetchImpl);
-  const [,, slugPart] = pr.head.ref.split('/');
-  const slugFromBranch = slugPart.slice(0, -9);
-  if (slugFromBranch !== draft.slug) throw new Error('文章路径不能在草稿创建后更改');
-  const commit = await commitFiles(pr.head.ref, { ...draft, author: pr.head.ref.split('/')[1] }, attachments, token, fetchImpl);
+  const location = validateBranch(pr.head.ref);
+  if (location.slug !== draft.slug || (location.directory && location.directory !== draft.directory)) throw new Error('文章路径或分类不能在草稿创建后更改');
+  const commit = await commitFiles(pr.head.ref, { ...draft, author: location.author }, attachments, location.directory, token, fetchImpl);
   if (pr.title !== draft.title) await githubRequest(`${REPO_PATH}/pulls/${number}`, token, { method: 'PATCH', body: { title: draft.title }, fetchImpl });
   return { number, url: pr.html_url, branch: pr.head.ref, commit };
 }
@@ -220,13 +230,14 @@ export async function listDrafts(token, fetchImpl = fetch) {
 
 export async function loadDraft(number, token, fetchImpl = fetch) {
   const pr = await getManagedPull(number, token, fetchImpl);
-  const slug = pr.head.ref.split('/')[2].slice(0, -9);
+  const { slug, directory } = validateBranch(pr.head.ref);
+  const base = postPath(directory, slug);
   const ref = encodeURIComponent(pr.head.ref);
-  const article = await githubRequest(`${REPO_PATH}/contents/source/_posts/${slug}.md?ref=${ref}`, token, { fetchImpl });
+  const article = await githubRequest(`${REPO_PATH}/contents/${base}.md?ref=${ref}`, token, { fetchImpl });
   const bytes = Uint8Array.from(atob(article.content.replace(/\s/g, '')), char => char.charCodeAt(0));
   let mindmap = null;
   try {
-    const map = await githubRequest(`${REPO_PATH}/contents/source/_posts/${slug}/mindmap.json?ref=${ref}`, token, { fetchImpl });
+    const map = await githubRequest(`${REPO_PATH}/contents/${base}/mindmap.json?ref=${ref}`, token, { fetchImpl });
     const mapBytes = Uint8Array.from(atob(map.content.replace(/\s/g, '')), char => char.charCodeAt(0));
     mindmap = JSON.parse(new TextDecoder().decode(mapBytes));
   } catch (error) {

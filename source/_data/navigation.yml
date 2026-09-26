@@ -1,0 +1,7 @@
+sections:
+  - directory: tech
+    title: 机器人技术
+    category: 机器人技术
+  - directory: life
+    title: 生活随笔
+    category: 生活随笔

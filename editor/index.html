@@ -33,7 +33,7 @@
             <label class="field">英文路径<input id="post-slug" name="slug" required pattern="[a-z0-9-]+" placeholder="my-new-post"><small>保存草稿后不可更改。</small></label>
             <label class="field">日期<input id="post-date" name="date" type="datetime-local" required></label>
             <label class="field field-wide">摘要<textarea id="post-description" name="description" maxlength="300" rows="2" placeholder="用一两句话说明文章内容"></textarea></label>
-            <label class="field">分类<select id="post-category" name="category"><option value="机器人技术">机器人技术</option><option value="生活随笔">生活随笔</option></select></label>
+            <label class="field">分类<select id="post-category" name="category"><option value="机器人技术">机器人技术</option><option value="生活随笔">生活随笔</option></select><small>分别保存到 tech/、life/；草稿创建后不可更改。</small></label>
             <label class="field">标签<input id="post-tags" name="tags" placeholder="多个标签用逗号分隔"></label>
           </div>
           <div class="editor-section-head"><div><h2>正文</h2><p>支持 Markdown 与可视化模式切换；图片会随文章草稿保存。</p></div><label class="secondary-action image-button">插入图片<input id="image-upload" type="file" accept="image/png,image/jpeg,image/webp" multiple hidden></label></div>
