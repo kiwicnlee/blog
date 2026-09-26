@@ -1,0 +1,16 @@
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="<%- url_for('/') %>" aria-label="<%= config.title %>，返回首页">
+      <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+      <span class="brand-name"><%= config.title %><small>NOTES & MOMENTS</small></span>
+    </a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="打开导航菜单"><span></span><span></span><span></span></button>
+    <nav id="site-nav" class="site-nav" aria-label="主导航">
+      <a class="<%= is_home() ? 'active' : '' %>" href="<%- url_for('/') %>">首页</a>
+      <a class="<%= is_archive() || is_post() ? 'active' : '' %>" href="<%- url_for('/archives/') %>">文章</a>
+      <a class="<%= page.path === 'categories/index.html' || is_category() ? 'active' : '' %>" href="<%- url_for('/categories/') %>">分类</a>
+      <a class="<%= page.path === 'about/index.html' ? 'active' : '' %>" href="<%- url_for('/about/') %>">关于</a>
+    </nav>
+    <a class="header-link" href="<%- url_for('/archives/') %>">开始阅读 <span aria-hidden="true">↗</span></a>
+  </div>
+</header>

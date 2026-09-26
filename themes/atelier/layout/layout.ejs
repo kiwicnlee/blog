@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f3ec">
+  <% const pageTitle = is_home() ? config.title : ((page.title || '文章') + ' · ' + config.title); %>
+  <title><%= pageTitle %></title>
+  <meta name="description" content="<%= page.description || config.description %>">
+  <link rel="icon" href="<%- url_for('/favicon.svg') %>" type="image/svg+xml">
+  <link rel="stylesheet" href="<%- url_for('/css/style.css') %>">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳转到正文</a>
+  <div class="site-shell">
+    <%- partial('_partial/header') %>
+    <main id="main"><%- body %></main>
+    <%- partial('_partial/footer') %>
+  </div>
+  <script src="<%- url_for('/js/site.js') %>" defer></script>
+</body>
+</html>
