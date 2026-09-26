@@ -6,7 +6,7 @@
   "scripts": {
     "build": "hexo generate",
     "clean": "hexo clean",
-    "deploy": "hexo deploy",
+    "deploy": "./pulish.sh",
     "server": "hexo server"
   },
   "hexo": {

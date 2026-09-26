@@ -30,8 +30,17 @@ pnpm run build
 
 ## 发布到 GitHub Pages
 
-1. 将此项目推送到 GitHub 仓库 `kiwicnlee/blog` 的 `main` 或 `master` 分支。
-2. 在仓库的 **Settings → Pages → Build and deployment** 中，将 **Source** 设为 **GitHub Actions**。
-3. 推送后，`.github/workflows/pages.yml` 会安装锁定的依赖、生成 `public/`，并部署到 `https://kiwicnlee.github.io/blog/`。也可以在 **Actions** 页面手动运行该工作流。
+在此工作目录中，使用 `pulish.sh` 发布源码，不依赖本地 `.git` 元数据，也不修改全局 Git 配置：
+
+```bash
+./pulish.sh --dry-run
+./pulish.sh "更新博客文章"
+```
+
+脚本先比较远端 `kiwicnlee/blog` 的 `main` 分支，只上传有变化的源码，并在写入远端前运行 `pnpm run build`。需要删除远端已有、但本地已移除的文章或文件时，显式加 `--delete`。`pnpm run deploy` 也会调用此脚本。
+
+认证优先使用环境变量 `GH_TOKEN` 或 `GITHUB_TOKEN`；未设置时，只读现有的 `~/.git-credentials`。令牌需要该仓库的 **Contents: write** 权限；修改工作流文件时还可能需要 **Workflows: write** 权限。脚本不会打印令牌或将其写入新文件。
+
+仓库的 **Settings → Pages → Build and deployment → Source** 应设为 **GitHub Actions**。发布后，`.github/workflows/pages.yml` 会安装锁定的依赖、生成 `public/`，并部署到 `https://kiwicnlee.github.io/blog/`。
 
 如果以后更换仓库路径或使用自定义域名，请同步修改 `_config.yml` 的 `url`，重新构建后检查首页和文章页的链接。
