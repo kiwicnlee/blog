@@ -10,7 +10,6 @@ const env = {
   GITHUB_APP_ID: '123',
   GITHUB_INSTALLATION_ID: '456',
   GITHUB_PRIVATE_KEY: 'test-key',
-  ALLOWED_GITHUB_IDS: '1,42',
   EDITOR_ORIGIN: 'https://editor.example.test',
   AUTH_LIMITER: { limit: async () => ({ success: true }) },
   API_LIMITER: { limit: async () => ({ success: true }) },
@@ -32,7 +31,7 @@ test('login rate limit blocks repeated requests before redirecting', async () =>
   assert.equal(response.status, 429);
 });
 
-test('OAuth callback accepts only matching state and allowlisted GitHub identities', async () => {
+test('OAuth callback accepts only matching state and the blog owner', async () => {
   const login = await createHandler()(new Request('https://editor.example.test/auth/login'), env);
   const state = new URL(login.headers.get('Location')).searchParams.get('state');
   const cookie = login.headers.getSetCookie().map(value => value.split(';')[0]).join('; ');
@@ -43,7 +42,7 @@ test('OAuth callback accepts only matching state and allowlisted GitHub identiti
       assert.match(options.body.get('code_verifier'), /^[A-Za-z0-9_-]{43}$/);
       return new Response(JSON.stringify({ access_token: 'user-token' }), { headers: { 'Content-Type': 'application/json' } });
     }
-    if (url === 'https://api.github.com/user') return new Response(JSON.stringify({ id: 42, login: 'alice' }), { headers: { 'Content-Type': 'application/json' } });
+    if (url === 'https://api.github.com/user') return new Response(JSON.stringify({ id: 225505821, login: 'kiwicnlee' }), { headers: { 'Content-Type': 'application/json' } });
     throw new Error(`Unexpected URL: ${url}`);
   } });
   const invalid = await handle(new Request('https://editor.example.test/auth/callback?code=one&state=wrong', { headers: { Cookie: cookie } }), env);
@@ -55,13 +54,29 @@ test('OAuth callback accepts only matching state and allowlisted GitHub identiti
   assert.equal(outbound, 2);
 });
 
+test('OAuth callback rejects a valid login from another GitHub account', async () => {
+  const login = await createHandler()(new Request('https://editor.example.test/auth/login'), env);
+  const state = new URL(login.headers.get('Location')).searchParams.get('state');
+  const cookie = login.headers.getSetCookie().map(value => value.split(';')[0]).join('; ');
+  const handle = createHandler({ fetchImpl: async url => {
+    if (url === 'https://github.com/login/oauth/access_token') return Response.json({ access_token: 'other-user-token' });
+    if (url === 'https://api.github.com/user') return Response.json({ id: 42, login: 'alice' });
+    throw new Error(`Unexpected URL: ${url}`);
+  } });
+  const response = await handle(new Request(`https://editor.example.test/auth/callback?code=one&state=${state}`, {
+    headers: { Cookie: cookie },
+  }), env);
+  assert.equal(response.status, 403);
+  assert.equal(response.headers.get('Set-Cookie'), null);
+});
+
 test('draft endpoints reject missing sessions and cross-origin writes before GitHub access', async () => {
   let outbound = 0;
   const handle = createHandler({ fetchImpl: async () => { outbound++; throw new Error('Should not call GitHub'); } });
   const anonymous = await handle(new Request('https://editor.example.test/api/drafts'), env);
   assert.equal(anonymous.status, 401);
 
-  const cookie = await signSession({ id: 42, login: 'alice', csrf: 'a'.repeat(32), exp: Date.now() + 60000 }, env.SESSION_SECRET);
+  const cookie = await signSession({ id: 225505821, login: 'kiwicnlee', csrf: 'a'.repeat(32), exp: Date.now() + 60000 }, env.SESSION_SECRET);
   const response = await handle(new Request('https://editor.example.test/api/drafts', {
     method: 'POST',
     headers: { Cookie: `editor_session=${cookie}`, Origin: 'https://evil.example.test', 'X-CSRF-Token': 'a'.repeat(32) },
@@ -78,10 +93,10 @@ test('draft endpoints reject missing sessions and cross-origin writes before Git
   assert.equal(outbound, 0);
 });
 
-test('revoking an author from the allowlist invalidates existing sessions', async () => {
+test('sessions for other GitHub accounts cannot access the editor', async () => {
   const cookie = await signSession({ id: 42, login: 'alice', csrf: 'a'.repeat(32), exp: Date.now() + 60000 }, env.SESSION_SECRET);
   const response = await createHandler()(new Request('https://editor.example.test/api/me', {
     headers: { Cookie: `editor_session=${cookie}` },
-  }), { ...env, ALLOWED_GITHUB_IDS: '1' });
+  }), env);
   assert.equal(response.status, 401);
 });

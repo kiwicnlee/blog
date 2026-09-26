@@ -1,4 +1,4 @@
-import { allowedAuthor, equalState, newCodeVerifier, newCsrfToken, newOAuthState, oauthChallenge, parseCookie, readSession, secureCookie, signSession } from './auth.mjs';
+import { equalState, isOwner, newCodeVerifier, newCsrfToken, newOAuthState, oauthChallenge, parseCookie, readSession, secureCookie, signSession } from './auth.mjs';
 import { createDraft, GitHubError, githubRequest, installationToken, listDrafts, loadDraft, updateDraft, validateAttachments } from './github.mjs';
 import { validateDraft } from '../shared/content.mjs';
 
@@ -17,7 +17,7 @@ function problem(message, status) { return json({ error: message }, status); }
 function configured(env) {
   return !!(env.SESSION_SECRET && env.GITHUB_OAUTH_CLIENT_ID && env.GITHUB_OAUTH_CLIENT_SECRET &&
     env.GITHUB_APP_ID && env.GITHUB_INSTALLATION_ID && env.GITHUB_PRIVATE_KEY &&
-    env.ALLOWED_GITHUB_IDS && env.EDITOR_ORIGIN && env.AUTH_LIMITER && env.API_LIMITER);
+    env.EDITOR_ORIGIN && env.AUTH_LIMITER && env.API_LIMITER);
 }
 
 async function exchangeCode(code, verifier, origin, env, fetchImpl) {
@@ -93,7 +93,7 @@ export function createHandler({ fetchImpl = fetch } = {}) {
       try {
         const userToken = await exchangeCode(code, verifier, env.EDITOR_ORIGIN, env, fetchImpl);
         const user = await githubRequest('/user', userToken, { fetchImpl });
-        if (!allowedAuthor(user.id, env.ALLOWED_GITHUB_IDS)) return problem('你的 GitHub 账号尚未受邀', 403);
+        if (!isOwner(user.id)) return problem('仅博客所有者可以登录', 403);
         const session = await signSession({ id: user.id, login: user.login, csrf: newCsrfToken(), exp: Date.now() + SESSION_AGE * 1000 }, env.SESSION_SECRET);
         const headers = new Headers({ Location: '/', 'Cache-Control': 'no-store' });
         headers.append('Set-Cookie', secureCookie('oauth_state', '', request.url, 0));
@@ -109,7 +109,7 @@ export function createHandler({ fetchImpl = fetch } = {}) {
       if (!configured(env)) return problem('编辑后台尚未配置', 503);
       if (url.origin !== env.EDITOR_ORIGIN) return problem('编辑后台域名不匹配', 403);
       const session = await readSession(parseCookie(request.headers.get('Cookie'), 'editor_session'), env.SESSION_SECRET);
-      if (!session || !allowedAuthor(session.id, env.ALLOWED_GITHUB_IDS)) return problem('请先登录受邀的 GitHub 账号', 401);
+      if (!session || !isOwner(session.id)) return problem('请先使用博客所有者的 GitHub 账号登录', 401);
       if (!(await env.API_LIMITER.limit({ key: String(session.id) })).success) return problem('编辑请求过于频繁', 429);
       if (request.method !== 'GET') {
         if (request.headers.get('Origin') !== env.EDITOR_ORIGIN || !equalState(request.headers.get('X-CSRF-Token'), session.csrf)) {

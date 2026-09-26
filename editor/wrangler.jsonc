@@ -6,7 +6,7 @@
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
-    "run_worker_first": true
+    "run_worker_first": ["/api/*", "/auth/*", "/health"]
   },
   "ratelimits": [
     { "name": "AUTH_LIMITER", "namespace_id": "26092601", "simple": { "limit": 20, "period": 60 } },

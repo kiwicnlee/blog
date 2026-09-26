@@ -1,17 +1,17 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { allowedAuthor, equalState, newCsrfToken, parseCookie, readSession, secureCookie, signSession } from '../worker/auth.mjs';
+import { equalState, isOwner, newCsrfToken, parseCookie, readSession, secureCookie, signSession } from '../worker/auth.mjs';
 
 const secret = 'a-test-secret-that-is-longer-than-32-characters';
 
-test('session signature, expiry, and allowlist prevent unauthorized access', async () => {
+test('session signature, expiry, and owner identity prevent unauthorized access', async () => {
   const payload = { id: 42, login: 'Alice', csrf: newCsrfToken(), exp: Date.now() + 60000 };
   const token = await signSession(payload, secret);
   assert.equal((await readSession(token, secret)).login, 'Alice');
   assert.equal(await readSession(token + 'x', secret), null);
   assert.equal(await readSession(token, secret, payload.exp + 1), null);
-  assert.equal(allowedAuthor(42, '1,42'), true);
-  assert.equal(allowedAuthor(13, '1,42'), false);
+  assert.equal(isOwner(225505821), true);
+  assert.equal(isOwner(42), false);
 });
 
 test('cookies and OAuth state use scoped values', () => {

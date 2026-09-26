@@ -45,6 +45,6 @@ pnpm run build
 
 如果以后更换仓库路径或使用自定义域名，请同步修改 `_config.yml` 的 `url`，重新构建后检查首页和文章页的链接。
 
-## 多作者在线编辑
+## 个人在线编辑
 
-独立的 Cloudflare Worker 编辑后台位于 `editor/`，提供 GitHub 登录、草稿 PR、富文本和思维导图编辑。作者无需仓库写权限。部署 GitHub App 与 Worker 的步骤见 [editor/README.md](editor/README.md)。在后台登录和草稿流程验证完成前，主题的 `admin_url` 保持为空，公开博客不会显示不可用的入口。
+独立的 Cloudflare Worker 编辑后台位于 `editor/`，仅允许博客所有者通过 GitHub 登录，支持草稿 PR、富文本和思维导图编辑。部署 GitHub App 与 Worker 的步骤见 [editor/README.md](editor/README.md)。在后台登录和草稿流程验证完成前，主题的 `admin_url` 保持为空，公开博客不会显示不可用的入口。

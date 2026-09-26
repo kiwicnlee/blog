@@ -1,5 +1,6 @@
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
+const OWNER_GITHUB_ID = 225505821;
 
 function base64url(bytes) {
   return btoa(String.fromCharCode(...bytes)).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '');
@@ -50,10 +51,7 @@ export function secureCookie(name, value, requestUrl, maxAge, httpOnly = true) {
   return `${name}=${value}; Path=/; Max-Age=${maxAge}; SameSite=Lax${secure}${httpOnly ? '; HttpOnly' : ''}`;
 }
 
-export function allowedAuthor(id, rawAllowlist) {
-  if (!Number.isSafeInteger(id) || !rawAllowlist) return false;
-  return rawAllowlist.split(',').some(value => /^\d+$/.test(value.trim()) && Number(value.trim()) === id);
-}
+export function isOwner(id) { return id === OWNER_GITHUB_ID; }
 
 export function equalState(received, expected) {
   if (typeof received !== 'string' || typeof expected !== 'string' || received.length !== expected.length || received.length < 24) return false;
