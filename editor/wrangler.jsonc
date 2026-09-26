@@ -3,6 +3,9 @@
   "name": "kiwi-blog-editor",
   "main": "./worker/index.mjs",
   "compatibility_date": "2026-09-26",
+  "vars": {
+    "EDITOR_ORIGIN": "https://kiwi-blog-editor.kiwi-blog-editor.workers.dev"
+  },
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",

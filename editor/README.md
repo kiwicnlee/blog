@@ -1,6 +1,6 @@
 # Kiwi 个人写作后台
 
-这是与公开 Hexo 博客分开的 Cloudflare Worker。只有 `kiwicnlee` 本人（GitHub 数字 ID `225505821`）能通过 GitHub OAuth App 登录，编写 Markdown/富文本、图片和思维导图；Worker 用仅授权 `kiwicnlee/blog` 的私有 GitHub App 创建 `cms/...` 草稿分支及 PR。只有 PR 合并到 `main` 后，现有 Pages 工作流才会更新公开博客。
+这是与公开 Hexo 博客分开的 Cloudflare Worker。只有 `kiwicnlee` 本人（GitHub 数字 ID `225505821`）能通过 GitHub App 的 OAuth 登录，编写 Markdown/富文本、图片和思维导图；Worker 用仅授权 `kiwicnlee/blog` 的同一个私有 GitHub App 创建 `cms/...` 草稿分支及 PR。只有 PR 合并到 `main` 后，现有 Pages 工作流才会更新公开博客。
 
 ## 当前能力与边界
 
@@ -30,22 +30,22 @@ pnpm exec wrangler deploy --dry-run
 
 ## 部署准备
 
-1. 使用 Cloudflare Workers 账号部署 `editor/`，获得 `https://kiwi-blog-editor.<workers-subdomain>.workers.dev`。Worker 域名提供编辑页与 API，两者同源。公开博客仍由 GitHub Pages 托管。
-2. 在 GitHub 注册 **OAuth App**，回调地址设为 `https://<Worker 域名>/auth/callback`，关闭回调 URL 通配符匹配。它只用于识别所有者；后台不请求仓库写入 scope。记录 OAuth Client ID 和 Client Secret。
-3. 另注册一个仅限所有者安装的**私有 GitHub App**，仓库权限为 **Contents: Read and write** 与 **Pull requests: Read and write**，仅安装到 `kiwicnlee/blog`。它只作为编辑服务创建草稿。记录 App ID、Installation ID，并生成私钥。
-4. 在 Worker Secrets 中配置下表的值。GitHub App 私钥支持原始 PEM 文本（含 `BEGIN RSA PRIVATE KEY` 或 `BEGIN PRIVATE KEY`）。
-5. 在 GitHub 为 `main` 设置必须通过 PR 的分支规则，且不要让 GitHub App 绕过该规则。Worker 不提供直接合并接口；由所有者检查并合并 PR。
-6. 用所有者的真实账号完成登录、新建草稿、编辑和 PR 合并验证，再在博客主题配置中填写 `admin_url`，显示「写作后台」入口。
+1. Worker 已部署在 `https://kiwi-blog-editor.kiwi-blog-editor.workers.dev`。Worker 域名提供编辑页与 API，两者同源。公开博客仍由 GitHub Pages 托管。若以后更换域名，同步更新 `wrangler.jsonc` 的 `EDITOR_ORIGIN` 与 GitHub App 回调地址。
+2. 在 GitHub 注册一个仅限所有者安装的**私有 GitHub App**，回调地址设为 `https://kiwi-blog-editor.kiwi-blog-editor.workers.dev/auth/callback`，关闭回调 URL 通配符匹配。仓库权限为 **Contents: Read and write** 与 **Pull requests: Read and write**，仅安装到 `kiwicnlee/blog`。记录 App ID、Client ID、Installation ID，生成 Client Secret 和私钥。GitHub App 的 Client ID/Secret 用于登录，私钥用于生成安装令牌；不需要再创建单独的 OAuth App。
+3. 在 Worker Secrets 中配置下表的值。GitHub App 私钥支持原始 PEM 文本（含 `BEGIN RSA PRIVATE KEY` 或 `BEGIN PRIVATE KEY`）。
+4. 在 GitHub 为 `main` 设置必须通过 PR 的分支规则，且不要让 GitHub App 绕过该规则。Worker 不提供直接合并接口；由所有者检查并合并 PR。
+5. 用所有者的真实账号完成登录、新建草稿、编辑和 PR 合并验证，再在博客主题配置中填写 `admin_url`，显示「写作后台」入口。
 
 | Worker Secret | 用途 |
 | --- | --- |
 | `GITHUB_APP_ID` | GitHub App 数字 ID |
-| `GITHUB_OAUTH_CLIENT_ID` | 所有者登录专用 OAuth App Client ID |
-| `GITHUB_OAUTH_CLIENT_SECRET` | OAuth 授权码交换，绝不下发到浏览器 |
+| `GITHUB_OAUTH_CLIENT_ID` | 上述 GitHub App 的 Client ID，用于所有者登录 |
+| `GITHUB_OAUTH_CLIENT_SECRET` | 上述 GitHub App 的 Client Secret，用于授权码交换，绝不下发到浏览器 |
 | `GITHUB_INSTALLATION_ID` | 安装在本站仓库上的 Installation ID |
 | `GITHUB_PRIVATE_KEY` | GitHub App 私钥 PEM |
 | `SESSION_SECRET` | 至少 32 字符的随机会话签名密钥 |
-| `EDITOR_ORIGIN` | Worker 编辑站完整来源，例如 `https://kiwi-blog-editor.<subdomain>.workers.dev`，不带末尾斜线 |
+
+`EDITOR_ORIGIN` 已在 `wrangler.jsonc` 的 `vars` 中设为当前 Worker 地址，不是 Secret。
 
 代码中固定的所有者数字 ID 为 `225505821`。部署前可再次查询并核对：
 
