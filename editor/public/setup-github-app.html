@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>创建 Kiwi 博客 GitHub App</title>
+  <style>
+    body { max-width: 44rem; margin: 4rem auto; padding: 0 1.5rem; color: #19312d; font: 16px/1.7 system-ui, sans-serif; }
+    h1 { line-height: 1.25; }
+    button { border: 0; border-radius: .6rem; padding: .8rem 1.2rem; background: #1b6655; color: white; font: inherit; cursor: pointer; }
+    code { overflow-wrap: anywhere; }
+  </style>
+</head>
+<body>
+  <h1>创建 Kiwi 博客 GitHub App</h1>
+  <p>请先确认浏览器已登录 GitHub 账号 <strong>kiwicnlee</strong>。下方按钮会打开 GitHub 的应用创建确认页，预填权限与回调地址；提交前可以核对全部设置。</p>
+  <p>应用仅供个人使用，需要安装时只选择 <code>kiwicnlee/blog</code>。创建完成后，请从返回页面的地址栏复制 <code>code=</code> 后的临时代码给我；不要发送 App 私钥或 Client Secret。</p>
+  <form action="https://github.com/settings/apps/new" method="post">
+    <textarea name="manifest" hidden>{"name":"kiwicnlee-blog-editor","url":"https://kiwicnlee.github.io/blog/","description":"Kiwi 个人博客写作后台，仅创建文章草稿 PR","hook_attributes":{"url":"https://kiwi-blog-editor.kiwi-blog-editor.workers.dev/health","active":false},"redirect_url":"https://kiwi-blog-editor.kiwi-blog-editor.workers.dev/setup-return.html","callback_urls":["https://kiwi-blog-editor.kiwi-blog-editor.workers.dev/auth/callback"],"public":false,"default_permissions":{"contents":"write","pull_requests":"write"},"default_events":[],"request_oauth_on_install":false}</textarea>
+    <button type="submit">前往 GitHub 确认创建</button>
+  </form>
+</body>
+</html>

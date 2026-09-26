@@ -31,10 +31,11 @@ pnpm exec wrangler deploy --dry-run
 ## 部署准备
 
 1. Worker 已部署在 `https://kiwi-blog-editor.kiwi-blog-editor.workers.dev`。Worker 域名提供编辑页与 API，两者同源。公开博客仍由 GitHub Pages 托管。若以后更换域名，同步更新 `wrangler.jsonc` 的 `EDITOR_ORIGIN` 与 GitHub App 回调地址。
-2. 在 GitHub 注册一个仅限所有者安装的**私有 GitHub App**，回调地址设为 `https://kiwi-blog-editor.kiwi-blog-editor.workers.dev/auth/callback`，关闭回调 URL 通配符匹配。仓库权限为 **Contents: Read and write** 与 **Pull requests: Read and write**，仅安装到 `kiwicnlee/blog`。记录 App ID、Client ID、Installation ID，生成 Client Secret 和私钥。GitHub App 的 Client ID/Secret 用于登录，私钥用于生成安装令牌；不需要再创建单独的 OAuth App。
-3. 在 Worker Secrets 中配置下表的值。GitHub App 私钥支持原始 PEM 文本（含 `BEGIN RSA PRIVATE KEY` 或 `BEGIN PRIVATE KEY`）。
-4. 在 GitHub 为 `main` 设置必须通过 PR 的分支规则，且不要让 GitHub App 绕过该规则。Worker 不提供直接合并接口；由所有者检查并合并 PR。
-5. 用所有者的真实账号完成登录、新建草稿、编辑和 PR 合并验证，再在博客主题配置中填写 `admin_url`，显示「写作后台」入口。
+2. 用 `https://kiwi-blog-editor.kiwi-blog-editor.workers.dev/setup-github-app.html` 打开预填的 GitHub App 创建页。请确认 GitHub 已登录 `kiwicnlee`，在 GitHub 页面核对权限后确认创建，再从返回页地址栏提供一次性 `code`。此代码在一小时内兑换为 App ID、Client ID、Client Secret 与私钥；长期密钥直接写入 Cloudflare Secrets，不要发送到聊天。App 的 Client ID/Secret 用于登录，私钥用于生成安装令牌；不需要再创建单独的 OAuth App。
+3. 在 GitHub 安装这个**私有 GitHub App**，仓库范围只选择 `kiwicnlee/blog`。安装后获取 Installation ID 并配置为 Worker Secret。若手动创建 App，回调地址应为 `https://kiwi-blog-editor.kiwi-blog-editor.workers.dev/auth/callback`，关闭回调 URL 通配符匹配，仓库权限仅为 **Contents: Read and write** 与 **Pull requests: Read and write**。
+4. 在 Worker Secrets 中配置下表的值。GitHub App 私钥支持原始 PEM 文本（含 `BEGIN RSA PRIVATE KEY` 或 `BEGIN PRIVATE KEY`）。
+5. 在 GitHub 为 `main` 设置必须通过 PR 的分支规则，且不要让 GitHub App 绕过该规则。Worker 不提供直接合并接口；由所有者检查并合并 PR。
+6. 用所有者的真实账号完成登录、新建草稿、编辑和 PR 合并验证，再在博客主题配置中填写 `admin_url`，显示「写作后台」入口。
 
 | Worker Secret | 用途 |
 | --- | --- |
