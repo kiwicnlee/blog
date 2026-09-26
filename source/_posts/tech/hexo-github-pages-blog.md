@@ -1,6 +1,7 @@
 ---
 title: 从 Hexo 到 GitHub Pages：个人博客搭建与发布总结
 date: 2026-09-26 16:21:00
+permalink: 2026/09/26/hexo-github-pages-blog/
 description: 以 kiwi 的个人博客为例，梳理 Hexo 写作、项目站点路径配置、GitHub Actions 构建和 GitHub Pages 发布的完整流程。
 categories:
   - 机器人技术

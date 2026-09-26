@@ -1,6 +1,7 @@
 ---
 title: 技术笔记：把机器人问题排查过程写清楚
 date: 2026-09-25 00:00:00
+permalink: 2026/09/24/robotics-notes/
 description: 一篇示例技术笔记，展示如何记录现象、证据和下一步验证。
 categories:
   - 机器人技术

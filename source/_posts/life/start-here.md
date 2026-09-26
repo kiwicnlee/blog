@@ -1,6 +1,7 @@
 ---
 title: 从这里开始：写给这个博客的第一封信
 date: 2026-09-26 00:00:00
+permalink: 2026/09/25/start-here/
 description: 一个关于机器人技术与生活记录的博客，就从这一页开始。
 categories:
   - 生活随笔

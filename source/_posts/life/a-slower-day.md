@@ -1,6 +1,7 @@
 ---
 title: 生活随笔：给忙碌的日子留一点空白
 date: 2026-09-24 00:00:00
+permalink: 2026/09/23/a-slower-day/
 description: 一篇示例生活随笔，提醒自己在忙碌之外保留观察与休息的时间。
 categories:
   - 生活随笔
